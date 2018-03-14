@@ -1,5 +1,9 @@
-engineer_data.csv
+engineer_datagit .csv
 Systems_Report.Rproj
+
+##Ignoring CSV FILES
+*.csv
+
 
 # Created by https://www.gitignore.io/api/r
 
