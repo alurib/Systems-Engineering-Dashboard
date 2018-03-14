@@ -62,6 +62,25 @@ withdraw_fail_sys <- systems_courses %>%
             PercentFailed = mean(Failed),
             Count = n())
 
+## Plot showing percentage of students withdrew from classes
+ggplot(withdraw_fail_sys, aes(x= Year,y = PercentWithdrew, color = Semester))+
+  geom_bar( stat = "identity", color = "black")+
+  facet_grid(Semester~floored_catalog)+
+  ylab("Percentage of Students Withdrew")+
+  ggtitle("Withdrawl Percentage by Year")
+
+## Plot showing percentage of students failed
+ggplot(withdraw_fail_sys, aes(x= Year,y = PercentFailed, color = Semester))+
+  geom_bar( stat = "identity", color = "black")+
+  facet_grid(Semester~floored_catalog)+
+  ylab("Percentage of Students Failed")+
+  ggtitle("Fail Percentage by Year")
+
+###################################################################################
+
+## Total number of students enrolled in same level courses in different years seems
+## off. Checking why the number of students enrolled in 3000 and 4000 level courses 
+## are low in the year 2009.
 systems_courses %>% 
   filter(floored_catalog %in% c("3000","4000")
          & Year == "10")
@@ -110,3 +129,7 @@ student_comparision_sys <- systems_courses %>%
   mutate(enrollment_count_isequal = ifelse(data_count == mentioned_count,1,0))
 
 ## Most of the classes don't have the same counts as mentioned in the data
+
+##################################################################################
+
+
