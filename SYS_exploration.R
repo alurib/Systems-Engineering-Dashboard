@@ -14,7 +14,9 @@ systems1 <- systems %>%
          CATALOG_NUMBER = factor(CATALOG_NUMBER),
          OFFICIAL_GRADE = factor(OFFICIAL_GRADE),
          Grade_Collapsed = OFFICIAL_GRADE,
-         academic_year = factor(if_else(Semester == "Fall", Year,Year-1 )))
+         academic_year = factor(if_else(Semester == "Fall", Year,Year-1 )),
+         Dropped = ifelse(STUDENT_ENROLLMENT_STATUS == "Dropped",1,0),
+         Withdrew = if_else(OFFICIAL_GRADE == "W",1,0))
 
 ## Subsetting system courses
 systems_courses <- systems %>% 
@@ -27,7 +29,9 @@ systems_courses <- systems %>%
          CATALOG_NUMBER = factor(CATALOG_NUMBER),
          OFFICIAL_GRADE = factor(OFFICIAL_GRADE),
          Grade_Collapsed = OFFICIAL_GRADE,
-         academic_year = factor(if_else(Semester == "Fall", Year,Year-1 )))
+         academic_year = factor(if_else(Semester == "Fall", Year,Year-1 )),
+         Dropped = ifelse(STUDENT_ENROLLMENT_STATUS == "Dropped",1,0),
+         Withdrew = if_else(OFFICIAL_GRADE == "W",1,0))
 summary(systems_courses)
 
 levels(systems_courses$academic_year)
@@ -174,18 +178,27 @@ student_comparision_sys <- student_comparision_sys_bysection %>%
 
 ## Making line plots showing grades
 
-levels(systems_courses$Grade_Collapsed) <- c("Dropped", "A","A","A","AU","B","B","B","C","C","C",
-                                            "CR","D","D","D","F","IN","NC","W")
+levels(systems_courses$Grade_Collapsed) <- c("DNF", "A","A","A","AU","B","B","B","C","C","C",
+                                            "CR","D","D","D","DNF","IN","NC","DNF")
 
-grades <- systems_courses %>% 
-  mutate(Withdrew = if_else(Grade_Collapsed == "W",1,0),
-         Dropped = if_else(Grade_Collapsed == "Dropped",1,0)) %>% 
-  filter(Grade_Collapsed %in% c("A","B","C","D","F","W") &
+grades <- systems_courses %>%
+  filter(Grade_Collapsed %in% c("A","B","C","D","DNF") &
            academic_year %in% c("12","13","14","15","16"))
 
 ggplot(grades, aes(x= academic_year,fill = Grade_Collapsed))+
   geom_bar( position = "fill")+
   facet_grid(Semester ~ floored_catalog)
+
+
+## 6000 and 7000 level courses
+
+higherlevel <- systems_courses %>%
+  filter(academic_year %in% c("12","13","14","15","16")&
+           floored_catalog %in% c("6000","7000"))
+## Not worth comparing grades of students who take higher level classes to 
+## other students because we just have 28 observations. 
+## It would be biased if we make comparisions between datasets with such large
+## differences.
 
 ##################################################################################
 
@@ -196,7 +209,7 @@ c <- systems %>%
   summarise(majors = n_distinct(majdesc1),
             terms = n_distinct(term_sequence))
 
-summary(factor(c$majors))
+summary(factor(c$majors)) ## Number of majors 
 ## 1- 43, 2-3802, 3-795, 4-239, 5-61, 6-10, 7-1
 
 summary(factor(c$terms))
