@@ -160,15 +160,16 @@ summary(factor(systems1$academic_year))
 ## given in the data
 
 student_comparision_sys_bysection <- systems_courses %>% 
-  group_by(SUBJECT,CATALOG_NUMBER,Year, Semester, CLASS_SECTION) %>% 
+  group_by(SUBJECT,CATALOG_NUMBER,academic_year, Semester, CLASS_SECTION) %>% 
   summarise(data_count = n(),
             mentioned_count = mean(ENROLLMENT_TOTAL),
             enrolled_by_mentioned = data_count/mentioned_count) %>% 
   mutate(enrollment_count_isequal = ifelse(data_count == mentioned_count,1,0))
 
 student_comparision_sys <- student_comparision_sys_bysection %>% 
-  filter(Semester %in% c("Fall","Spring")) %>% 
-  group_by(SUBJECT,CATALOG_NUMBER,Year, Semester) %>% 
+  filter(Semester %in% c("Fall","Spring") &
+           academic_year %in% c("12","13","14","15","16")) %>% 
+  group_by(academic_year, Semester,CATALOG_NUMBER) %>% 
   summarise(Data_Count = sum(data_count),
             Mentioned_Count = sum(mentioned_count),
             enrolled_by_mentioned = Data_Count/Mentioned_Count)
@@ -218,3 +219,5 @@ summary(factor(c$terms))
 n_distinct(systems$studentid) ## 4951 students as whole
 
 #################################################################################
+
+saveRDS(systems_courses, file = "systemcourses.rds")
