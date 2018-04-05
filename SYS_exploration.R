@@ -16,7 +16,8 @@ systems1 <- systems %>%
          Grade_Collapsed = OFFICIAL_GRADE,
          academic_year = factor(if_else(Semester == "Fall", Year,Year-1 )),
          Dropped = ifelse(STUDENT_ENROLLMENT_STATUS == "Dropped",1,0),
-         Withdrew = if_else(OFFICIAL_GRADE == "W",1,0))
+         Withdrew = if_else(OFFICIAL_GRADE == "W",1,0)) %>% 
+  filter(!is.na(CATALOG_NUMBER))
 
 ## Subsetting system courses
 systems_courses <- systems %>% 
@@ -31,7 +32,9 @@ systems_courses <- systems %>%
          Grade_Collapsed = OFFICIAL_GRADE,
          academic_year = factor(if_else(Semester == "Fall", Year,Year-1 )),
          Dropped = ifelse(STUDENT_ENROLLMENT_STATUS == "Dropped",1,0),
-         Withdrew = if_else(OFFICIAL_GRADE == "W",1,0))
+         Withdrew = if_else(OFFICIAL_GRADE == "W",1,0)) %>% 
+  filter(!is.na(CATALOG_NUMBER))
+
 summary(systems_courses)
 
 levels(systems_courses$academic_year)
@@ -220,3 +223,24 @@ n_distinct(systems$studentid) ## 4951 students as whole
 #################################################################################
 
 saveRDS(systems_courses, file = "systemcourses.rds")
+
+#################################################################################
+
+## Selecting Unique Student Id's and their last opted major based on term 
+## sequence
+
+students <- systems1 %>%
+  group_by(studentid) %>% 
+  arrange(desc(term_sequence)) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  select(studentid,term_sequence,TERM,PRIMARY_ACADEMIC_PROGRAM,majdesc1,majdesc2)
+
+
+s <- systems1 %>% 
+  filter(studentid == "FYR20163391")
+## Seen that blanks for grades doesn't necessarily mean dropped classes. Can also
+## be a case of class type being discussion.
+
+catalog_na <- systems1 %>% 
+  filter(is.na(CATALOG_NUMBER)) ## 23275 cases
