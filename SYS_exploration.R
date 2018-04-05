@@ -205,7 +205,7 @@ higherlevel <- systems_courses %>%
 
 ## Looking at characteristics of unique students from SYS department
 
-c <- systems %>% 
+c <- systems1 %>% 
   group_by(studentid) %>% 
   summarise(majors = n_distinct(majdesc1),
             terms = n_distinct(term_sequence))
@@ -214,7 +214,6 @@ summary(factor(c$majors)) ## Number of majors
 ## 1- 43, 2-3802, 3-795, 4-239, 5-61, 6-10, 7-1
 
 summary(factor(c$terms))
-
 
 n_distinct(systems$studentid) ## 4951 students as whole
 
